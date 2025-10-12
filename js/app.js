@@ -23,7 +23,7 @@ function ingresoDatoUsuario(indice,dato_usuario){
             return datosUsuario[indice];
         else 
             window.alert("Debe ingresar un " + dato_usuario + " para continuar");
-    } while (datosUsuario[indice]=true);
+    } while (datosUsuario[indice]==true);
 }
 
 function saludarUsuario (nombre, apellido){
@@ -101,14 +101,13 @@ function revisarCarrito (carrito_usuario){
 }
 
 // Funcion para calcular el total de la compra una vez revisado el carrito
-function calcularTotal (carrito_usuario,total_compra){
-        total_compra = 0;
+function calcularTotal (carrito_usuario){
             for (let index = 0; index < carrito_usuario.length; index++) {
-                total_compra = total_compra + carrito_usuario[index].precio;
+                totalCompra = totalCompra + carrito_usuario[index].precio;
             }
-            precioFormateadoDolar = total_compra.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-            precioFormateadoPesos = (total_compra * precioDolar).toLocaleString('es-AR', {style: 'currency', currency: 'ARS'});
-                if (total_compra>0) {
+            precioFormateadoDolar = totalCompra.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+            precioFormateadoPesos = (totalCompra * precioDolar).toLocaleString('es-AR', {style: 'currency', currency: 'ARS'});
+                if (totalCompra>0) {
                     alert("Muchas gracias por haber comprado nuestros productos! \n\n " + listadoCompra + "\n\nTotal en pesos: " + precioFormateadoPesos + "\nTotal en dólares: USD " + precioFormateadoDolar);
                     console.log("Total de la compra: USD " + precioFormateadoDolar + " - " + precioFormateadoPesos);
                 } 
@@ -116,7 +115,7 @@ function calcularTotal (carrito_usuario,total_compra){
                     alert("¡Esperamos pronto su próxima visita!");
                     console.log("El usuario no realizo ninguna compra");
                 }
-            return total_compra;
+            return totalCompra;
 }
 
 // Simulador
@@ -131,4 +130,4 @@ carritoDeCompras();
 // Revision del carrito de compras
 listadoCompra = revisarCarrito(carritoUsuario);
 // Resultado final de la compra.
-calcularTotal(carritoUsuario,totalCompra);
+calcularTotal(carritoUsuario);
