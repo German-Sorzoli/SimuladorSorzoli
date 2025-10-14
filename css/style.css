@@ -1,0 +1,62 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header{
+    width:100%;
+}
+
+header nav{
+    width:100%;
+    padding:0 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+h1{
+    padding:.5em;
+    text-align:center;
+}
+
+h2{
+    padding:1em;
+    text-align:center;
+}
+
+header .verCarrito{
+    background-color:rgb(149, 219, 79);
+    border-color:rgb(0, 77, 0);
+    border-radius:5px;
+    color:white;
+    font-size:1em;
+    font-weight: 600;
+    padding:.5em 1em;
+}
+
+header .volverHome{ 
+    background-color:rgb(51, 82, 221);
+    border-color:black;
+    border-radius:5px;
+    color:white;
+    font-size:1em;
+    font-weight: 600;
+    padding:.5em 1em;
+}
+
+.listaProductos{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:6em 2em;
+    text-align:center;
+    width:100%;
+    padding: 3em 10%;
+}
+
+.hidden{
+    display:none;
+}
