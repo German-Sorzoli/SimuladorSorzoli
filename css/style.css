@@ -17,7 +17,6 @@ header nav{
     align-items: center;
 }
 
-
 h1{
     padding:.5em;
     text-align:center;
@@ -41,11 +40,31 @@ header .verCarrito{
 header .volverHome{ 
     background-color:rgb(51, 82, 221);
     border-color:black;
-    border-radius:5px;
+    border-radius:2em;
     color:white;
     font-size:1em;
     font-weight: 600;
     padding:.5em 1em;
+}
+
+.agregarAlCarro{
+    background-color:rgb(255, 146, 45);
+    border-color:rgb(255, 102, 0);
+    border-radius:2em;
+    color:white;
+    font-size:1em;
+    font-weight: 600;
+    padding:.5em 1em;
+}
+
+article .agregarUnProducto, .sacarUnProducto{
+    margin-top: 0;
+    background-color: rgb(157, 192, 255);
+    border-color: rgb(68, 68, 155);
+    border-radius:1em;
+    width:1.5em;
+    height:1.5em;
+    font-size:1.3em;
 }
 
 .listaProductos{
@@ -59,4 +78,63 @@ header .volverHome{
 
 .hidden{
     display:none;
+}
+
+.listaCarrito{
+ background-color: rgb(215, 236, 255);
+ height:auto;
+ padding:2em 1em;
+ margin:2em 15%;
+}
+
+.productoEnCarrito {
+    display:grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+}
+
+.productoEnCarrito li{
+    list-style: none;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding:1em 0;
+}
+
+.totalCarrito{
+    display:grid;
+    grid-template-columns: 5fr 1fr;
+}
+
+.totalCarrito{
+    margin-top:2em;
+    font-weight: 700;
+    font: size 1.5em;
+}
+
+.listaCarrito #botones{
+    display:flex;
+    justify-content: space-between;
+}
+
+.listaCarrito button{
+    margin-top:.5em;
+    border-radius:2em;
+}
+
+.operacionVaciar{
+    width:8em;
+    padding: .5em .5em;
+    border-color:lightgray;
+    background-color: white;
+}
+
+.operacionFinalizar{
+    padding: .5em 1.5em;
+    border-color:brown;
+    color:white;
+    font-weight: 600;
+    background-color: red;
+}
+
+.descripcionSeccion{
+padding:0 10%;
 }
