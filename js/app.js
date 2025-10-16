@@ -26,6 +26,7 @@ let totalCompra;
 
 // Si el producto no existia previamente en el carrito, lo agrega.
 function iniciarProducto(producto){
+    producto.existe=true;
     producto.cantidad = 1;
     producto.subtotal = producto.precio * producto.cantidad;
     carritoUsuario.push(producto); 
@@ -40,28 +41,34 @@ function agregarProducto(producto){
 }
 
 // Eliminar el producto, siempre y cuando no sea menor a 0
-function sacarProducto(producto){
-    if(producto.cantidad>0)
+function restarProducto(producto){
+    if(producto.cantidad>1 && producto.existe)
         {producto.cantidad--;
         producto.subtotal = producto.precio * producto.cantidad;
-        console.log(producto);
-        localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));  
         }
     else {
-        delete carritoUsuario[producto.id];
-        console.log(`El producto ${producto.nombre} fue eliminado`);
-        localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
+        producto.cantidad=0;
+        producto.existe=false;
+        let indexToDelete = carritoUsuario.findIndex(p => p.id == producto.id);
+        console.log(indexToDelete);
+        carritoUsuario.splice(indexToDelete,1);
+        mostrarCarrito();
+        // delete carritoUsuario[producto.id];
+        // let indexToRemove = carritoUsuario.findIndex(producto.id);
+        // carritoUsuario.splice(indexToRemove, 1);
     }
+    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
 }
 
 // Funcion que elimina todos los productos del carrito
 function vaciarCarrito(){
+    // Reinicia variables globales.
     carritoUsuario = [];
     totalCompra = 0;
     carritoVacio();
 }
-// Funcion que muestra un mensaje si el carrito esta vacio
 
+// Funcion que muestra un mensaje si el carrito esta vacio
 function carritoVacio(){
 let mensajeVacio = document.querySelector('.listaCarrito');
     mensajeVacio.innerHTML = `<h4>No tenés productos en tu carrito...</h4>
@@ -70,10 +77,11 @@ let mensajeVacio = document.querySelector('.listaCarrito');
 }
 
 // Funcion para renderizar un listado del carrito
-
 function mostrarCarrito (){
+    if (!carritoUsuario.length ==0 ){
+    // Almaceno el elemento de la clase listaCarrito.
     let productosEnCarrito = document.querySelector('.listaCarrito');
-    // Armo estructura HTML para mostrar los productos en el carrito
+    // Armo estructura de columnas en mi HTML para mostrar los productos en el carrito
     productosEnCarrito.innerHTML = 
             `<ul class="productoEnCarrito">
             <li>CÓDIGO</li>
@@ -82,9 +90,7 @@ function mostrarCarrito (){
             <li>CANTIDAD</li>
             <li>SUBTOTAL</li>
         </ul>` 
-        // Limpio el HTML para evitar duplicados
-
-// Recorro el array de productos en el carrito
+    // Recorro el array de productos en el carrito
     carritoUsuario.forEach((producto) =>{
         let article = document.createElement("article");
         // Armo estructura HTML para mostrar los productos en el carrito
@@ -99,24 +105,28 @@ function mostrarCarrito (){
         `;
         // Agrego estilos al articulo
         article.classList.add("productoEnCarrito");
-        // Agrego el articulo a la seccion de productos
+        // Agrego el articulo a la seccion de productos en carrito
         productosEnCarrito.appendChild(article);
     });
 retomarCarrito();
-calcularTotal();
+calcularTotal();}
+else {
+    carritoVacio();
+}
 }
 
-
+// Funcion que la de operatividad a los nuevos botones "+" y "-" dentro de la vista de carrito
 function retomarCarrito (){
+    // Tomo los elementos "+" y "-" del HTML creado al estar en modo vista carrito.
     let botonesCarritoAgregar = document.querySelectorAll('.agregarUnProducto');
-    let botonesCarritoRestar = document.querySelectorAll('.sacarUnProducto');
+    let botonesCarritoRestar = document.querySelectorAll('.sacarUnProducto'); 
 
     botonesCarritoAgregar.forEach((boton) => {
-    // Detecto evento click en cada boton
+    // Detecto evento click en cada botón.
     boton.addEventListener('click', (e) => {
-        // Dentro de productoSeleccionado guardare la informacion del producto clickeado
         // Comparo el id del producto con el id del boton clickeado
         let idProducto = parseInt(e.target.dataset.id);
+        // Dentro de productoSeleccionado guardare la informacion del producto clickeado
         let productoSeleccionado = carritoUsuario.find((producto) => producto.id === idProducto);
             // Aumento la cantidad de productos en el carrito
             agregarProducto(productoSeleccionado);
@@ -125,10 +135,9 @@ function retomarCarrito (){
             cantidadElemento.textContent = productoSeleccionado.cantidad;
             let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
             subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
-            recalcularTotal();
-        })
-    });
-    
+            reCalcularTotal();
+            })});
+
     botonesCarritoRestar.forEach((boton) => {
     // Detecto evento click en cada boton
     boton.addEventListener('click', (e) => {
@@ -137,20 +146,19 @@ function retomarCarrito (){
         let idProducto = parseInt(e.target.dataset.id);        
         let productoSeleccionado = carritoUsuario.find((producto) => producto.id == idProducto);
             // Resto la cantidad de productos en el carrito
-            sacarProducto(productoSeleccionado);
+            restarProducto(productoSeleccionado);
             // Actualizo el HTML
             let cantidadElemento = document.querySelector(`.cantidad-id-${idProducto}`);
             cantidadElemento.textContent = productoSeleccionado.cantidad;
             let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
             subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
-            recalcularTotal();
+            reCalcularTotal();
         })})
 };
 
 //
-function recalcularTotal() {
+function reCalcularTotal() {
     let totalElemento=document.querySelector(`#total`);
-    console.log(totalElemento);
     totalCompra = 0;
     carritoUsuario.forEach((producto) =>{
         totalCompra = totalCompra + producto.subtotal;
@@ -189,7 +197,6 @@ function calcularTotal (){
     botonFinalizar.classList.add("botones");
     botonFinalizar.classList.add("operacionFinalizar");
     botonFinalizar.addEventListener('click', () => {
-        console.log('Se concretó la compra');
         finalizarCarrito();})
     productosEnCarrito.appendChild(botonFinalizar);
 };
