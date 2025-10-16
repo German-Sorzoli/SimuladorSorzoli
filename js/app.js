@@ -15,7 +15,7 @@ const listaProductos = [
 
 // Defino un array de objetos que contendrá los productos agregados al carrito.
 // Si ya hay informacion en el navegador, tomara esos datos, sino se iniciará vacío.
-let carritoUsuario = [] || JSON.parse(localStorage.getItem("CarritoTG"));
+let carritoUsuario = JSON.parse(localStorage.getItem("CarritoTG")) || [];
 // Variable global que almacena el total del carrito
 let totalCompra;
 
@@ -49,13 +49,10 @@ function restarProducto(producto){
     else {
         producto.cantidad=0;
         producto.existe=false;
+        // El producto ya no existe en el carrito, por lo tanto lo elimino del HTML
         let indexToDelete = carritoUsuario.findIndex(p => p.id == producto.id);
-        console.log(indexToDelete);
         carritoUsuario.splice(indexToDelete,1);
         mostrarCarrito();
-        // delete carritoUsuario[producto.id];
-        // let indexToRemove = carritoUsuario.findIndex(producto.id);
-        // carritoUsuario.splice(indexToRemove, 1);
     }
     localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
 }
@@ -135,6 +132,7 @@ function retomarCarrito (){
             cantidadElemento.textContent = productoSeleccionado.cantidad;
             let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
             subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
+            //Recalculo total
             reCalcularTotal();
             })});
 
@@ -147,11 +145,14 @@ function retomarCarrito (){
         let productoSeleccionado = carritoUsuario.find((producto) => producto.id == idProducto);
             // Resto la cantidad de productos en el carrito
             restarProducto(productoSeleccionado);
-            // Actualizo el HTML
+            // Si al restar cantidad aun quedan productos, actualizo el HTML
+            if(productoSeleccionado.cantidad>0) {
             let cantidadElemento = document.querySelector(`.cantidad-id-${idProducto}`);
             cantidadElemento.textContent = productoSeleccionado.cantidad;
             let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
             subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
+            }
+            //Recalculo total
             reCalcularTotal();
         })})
 };
@@ -160,11 +161,14 @@ function retomarCarrito (){
 function reCalcularTotal() {
     let totalElemento=document.querySelector(`#total`);
     totalCompra = 0;
+    if (!carritoUsuario.length ==0){
     carritoUsuario.forEach((producto) =>{
         totalCompra = totalCompra + producto.subtotal;
     });
-    
-    totalElemento.textContent = `USD ${totalCompra}.-`;
+    totalElemento.textContent = `USD ${totalCompra}.-`;}
+    else {
+        carritoVacio();
+    }
     localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
 }
 
@@ -198,7 +202,7 @@ function calcularTotal (){
     botonFinalizar.classList.add("operacionFinalizar");
     botonFinalizar.addEventListener('click', () => {
         finalizarCarrito();})
-    productosEnCarrito.appendChild(botonFinalizar);
+        productosEnCarrito.appendChild(botonFinalizar);
 };
 
 
