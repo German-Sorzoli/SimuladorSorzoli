@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Bootstrap -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- Hoja de Estilos -->
     <link rel="stylesheet" href="css/style.css"></link>
     <!-- Informacion SEO On-Page -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Primer pre-entrega del curso de JavaScript en Coderhouse, simulador de compra de productos en una tienda de videojuegos.">
+    <meta name="description" content="Entrega Final para curso de JavaScript en Coderhouse, simulador de compra de productos en una tienda de videojuegos.">
     <meta name="keywords" content="JavaScript, Coderhouse, Simulador, Pre-Entrega">
-    <title>Pre-entrega N°1 - Germán Sorzoli</title>
+    <title>Entrega Final - Simulador de Tienda Online - Germán Sorzoli</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,14 +22,57 @@
 </head>
 <body>
     <header>
-        <nav>
-            <h1>TIENDA-GAMER</h1>
-            <button class="verCarrito">Ver carrito</button>
+        <nav id="main_nav" class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a href="#"><h1 href="#">TIENDA-GAMER</h1></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">Legales</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">Contacto</a>
+                    </li>
+                </ul>
+                <button class="verCarrito">Ver carrito</button>
+                </div>
+            </div>
         </nav>
-    <h2>¡Bienvenido a nuestra plataforma de compras online!</h2>
-    </header>
+        <form class="d-flex search-bar" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Busca un producto" aria-label="Buscar"/>
+                    <button class="btn" id="search-btn" type="submit">Buscar</button>
+        </form>
+    </header> 
 
     <section class="descripcionSeccion">
+        <h2>¡Bienvenido a nuestra plataforma de compras online!</h2>
+        <div id="carouselExampleFade" class="carousel slide carousel-fade">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                <img src="..." class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                <img src="..." class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                <img src="..." class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
         <h3>Elige entre nuestros productos:</h3>
     </section>
 
@@ -36,9 +81,9 @@
 
     <section class="listaCarrito oculto">
         <article id="#botones">
-
         </article>
     </section>
-
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>

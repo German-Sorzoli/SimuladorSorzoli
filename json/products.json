@@ -1,0 +1,182 @@
+[
+    {
+        "id":1,
+        "nombre":"Super Mario Bros.™ Wonder",
+        "consola": "Nintendo Switch",
+        "precio":59.99
+    },
+    {
+        "id":2,
+        "nombre":"Leyendas Pokémon™: Z-A",
+        "consola": "Nintendo Switch",
+        "precio":69.99
+    },
+    {
+        "id":3,
+        "nombre":"Mario Kart™ World",
+        "consola": "Nintendo Switch",
+        "precio":79.99
+    },
+    {
+        "id":4,
+        "nombre":"Donkey Kong™ Bananza",
+        "consola": "Nintendo Switch",
+        "precio":69.99
+    },
+    {
+        "id":5,
+        "nombre":"Bayonetta™ 3",
+        "consola": "Nintendo Switch",
+        "precio":59.99
+    },
+    {
+        "id":6,
+        "nombre":"Animal Crossing™: New Horizons",
+        "consola": "Nintendo Switch",
+        "precio":59.99
+    },
+    {
+        "id":7,
+        "nombre":"Fire Emblem Warriors™: Three Hopes",
+        "consola": "Nintendo Switch",
+        "precio":59.99
+    },
+    {
+        "id":8,
+        "nombre":"Kirby™ and the Forgotten Land",
+        "consola": "Nintendo Switch",
+        "precio":79.99
+    },
+    {
+        "id":9,
+        "nombre":"Metroid Prime™ 4: Beyond",
+        "consola": "Nintendo Switch",
+        "precio":59.99
+    },
+    {
+        "id":10,
+        "nombre":"The Legend of Zelda™: Tears of the Kingdom",
+        "consola": "Nintendo Switch",
+        "precio":69.99
+    },
+        {
+        "id":11,
+        "nombre":"Battlefield™ 6",
+        "consola": "Xbox Series",
+        "precio":69.99
+    },
+    {
+        "id":12,
+        "nombre":"Call of Duty™: Black Ops 7",
+        "consola": "Xbox Series",
+        "precio":69.99
+    },
+    {
+        "id":13,
+        "nombre":"NBA™ 2k26",
+        "consola": "Xbox Series",
+        "precio":40.99
+    },
+    {
+        "id":14,
+        "nombre":"MLB The Show™ 25",
+        "consola": "Xbox Series",
+        "precio":23.99
+    },
+    {
+        "id":15,
+        "nombre":"Mafia™: The Old Country",
+        "consola": "Xbox Series",
+        "precio":49.99
+    },
+    {
+        "id":16,
+        "nombre":"Assassin's Creed™ Shadows",
+        "consola": "Xbox Series",
+        "precio":74.99
+    },
+    {
+        "id":17,
+        "nombre":"Clair Obscur™: Expedition 33",
+        "consola": "Xbox Series",
+        "precio":59.99
+    },
+    {
+        "id":18,
+        "nombre":"Grand Theft Auto™ V",
+        "consola": "Xbox Series",
+        "precio":19.99
+    },
+    {
+        "id":19,
+        "nombre":"Avatar™: Frontiers of Pandora",
+        "consola": "Xbox Series",
+        "precio":21.99
+    },
+    {
+        "id":20,
+        "nombre":"Star Wars™ Outlaws",
+        "consola": "Xbox Series",
+        "precio":41.99
+    },
+        {
+        "id":21,
+        "nombre":"God of War™: Ragnarok",
+        "consola": "PlayStation 5",
+        "precio":69.99
+    },
+    {
+        "id":22,
+        "nombre":"The Last of Us™ Part II",
+        "consola": "PlayStation 5",
+        "precio":49.99
+    },
+    {
+        "id":23,
+        "nombre":"Ghost of Yotei™",
+        "consola": "PlayStation 5",
+        "precio":69.99
+    },
+    {
+        "id":24,
+        "nombre":"Death Stranding™ 2: On the Beach",
+        "consola": "PlayStation 5",
+        "precio":69.99
+    },
+    {
+        "id":25,
+        "nombre":"Astro Bot™",
+        "consola": "PlayStation 5",
+        "precio":59.99
+    },
+    {
+        "id":26,
+        "nombre":"Marvel's Spider-Man™ 2",
+        "consola": "PlayStation 5",
+        "precio":69.99
+    },
+    {
+        "id":27,
+        "nombre":"Horizon™ Forbidden West",
+        "consola": "PlayStation 5",
+        "precio":59.99
+    },
+    {
+        "id":28,
+        "nombre":"Helldivers™ 2",
+        "consola": "PlayStation 5",
+        "precio":39.99
+    },
+    {
+        "id":29,
+        "nombre":"Uncharted™: Legacy of Thieves Collection",
+        "consola": "PlayStation 5",
+        "precio":49.99
+    },
+    {
+        "id":30,
+        "nombre":"The Last of Us™ Part I",
+        "consola": "PlayStation 5",
+        "precio":69.99
+    }
+]

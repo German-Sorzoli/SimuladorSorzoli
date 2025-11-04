@@ -6,28 +6,30 @@
 class ProductoCarrito{
 
     // Genero una entrade de producto al carrito
-    constructor(id,nombre,precio){
+    constructor(id,nombre,consola,precio){
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.existe = true;
         this.cantidad = 1;
-        this.subtotal = this.precio * this.cantidad; 
+        // Calculo de subtotal con 2 decimales.
+        this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
     }
 
     // Creo funcionalidad de agregar un producto existente al carrito
     agregarProducto(){
     this.cantidad++;
-    this.subtotal = this.precio * this.cantidad;
+    // Calculo de subtotal con 2 decimales.
+    this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
     // Guardo en Local Storage
-    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));  
+    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
     }
 
     // Creo funcionalidad de restar un producto existente al carrito
     restarProducto(){
         if(this.cantidad>1 && this.existe)
             {this.cantidad--;
-            this.subtotal = this.precio * this.cantidad;
+            this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
             }
             //Si la cantidad llega a 0, elimino la entrada en el carrito
         else {
@@ -46,18 +48,7 @@ class ProductoCarrito{
 
 // *************************** VARIABLES ********************************* //
 
-// Creo un array de objetos para los productos de la web
-const listaProductos = [
-    {id:1, nombre:"Nintendo Switch 2", precio:350},
-    {id:2, nombre:"Play Station 5", precio:460}, 
-    {id:3, nombre:"XBox Series X", precio:400},
-    {id:4, nombre:"PC", precio:600},
-    {id:5, nombre:"Play Station 4", precio:300},
-    {id:6, nombre:"XBox One", precio:300},
-    {id:7, nombre:"Nintendo Switch OLED", precio:300},
-    {id:8, nombre:"Play Station 3", precio:200},
-    {id:9, nombre:"XBox 360", precio:200},
-    ];
+let listaProductos=[];
 
 // Defino un array de objetos que contendrá los productos agregados al carrito.
 let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p => Object.assign(new ProductoCarrito(p.id, p.nombre, p.precio), p));
@@ -67,8 +58,63 @@ let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p
 // Variable global que almacena el total del carrito
 let totalCompra = 0;
 
-
 // *************************** FUNCIONES ********************************* //
+
+// Funcion que trae los datos de los productos dentro del archivo products.json
+// Implementacion de asincronía.
+
+const buscarListaProductosJSON = async () => {
+    try{
+        const response = await fetch('./json/products.json');
+        const data = await response.json();
+        listaProductos = data;
+        mostrarProductosHTML();
+    } catch (error){
+        console.log(error);
+    }
+}
+
+// Ejecuto la funcion
+buscarListaProductosJSON();
+
+// Funcion para mostrar los productos en el HTML
+function mostrarProductosHTML(){
+    // Tomo los productos dentro de listaProductos y los agrego al HTML
+    let productos = document.querySelector('.listaProductos');
+    // Recorro el array que ahora contiene a los productos obtenidos del JSON
+    listaProductos.forEach((producto) =>{
+        let articleProducto = document.createElement("article");
+        articleProducto.innerHTML = `
+        <img class="imagenProd" src="img/product_00${producto.id}.png" alt="${producto.nombre}">
+        <h4>${producto.nombre}</h4>
+        <p>USD ${producto.precio}.-</p>
+        <button class='agregarAlCarro operacionAgregar' data-id=${producto.id}>Agregar al carrito</button>`;
+        // Agrego el article al section de listaProductos en el HTML
+        productos.appendChild(articleProducto);
+    });
+    // *EVENTO*
+    // Agrego funcionalidad a los botones de agregar al carrito en la pagina principal.
+    let botonesAgregar = document.querySelectorAll('.operacionAgregar');
+    botonesAgregar.forEach((boton) => {
+        // Detecto evento click en cada boton.
+        boton.addEventListener('click', (e) => {
+            // Dentro de productoSeleccionado guardaré la informacion del producto clickeado.
+            // Comparo el id del producto con el id del boton clickeado.
+            const productoSeleccionado = listaProductos.find((producto) => producto.id === Number(e.target.dataset.id)); 
+            // Verifico si el producto ya se encuentra en el carrito
+            const productoExistente = carritoUsuario.find(p => p.id === productoSeleccionado.id);
+            if (productoExistente) {
+                // Si ya existe, aumento la cantidad de productos en el carrito.
+                productoExistente.agregarProducto();
+            } else {
+                // Si no existe, lo inicializo en el carrito
+                const nuevoProducto = new ProductoCarrito(productoSeleccionado.id,productoSeleccionado.nombre,productoSeleccionado.consola,productoSeleccionado.precio);
+                carritoUsuario.push(nuevoProducto);
+                localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
+            }
+        });
+    });
+}
 
 // Funcion principal para renderizar el listado del carrito.
 function mostrarCarrito (){
@@ -154,7 +200,8 @@ function retomarCarrito (){
             }
             //Recalculo total
             recalcularTotal();
-        })})
+        })
+    })
 };
 
 // Funcion para calcular el total de la compra, mostrarla en el HTML y modificar el DOM.
@@ -164,7 +211,8 @@ function calcularTotal (){
     let total = document.createElement("article");
     // Por cada producto del carrito sumo el total
     carritoUsuario.forEach((producto) =>{
-        totalCompra = totalCompra + producto.subtotal;
+        totalCompra = parseFloat((totalCompra + producto.subtotal).toFixed(2));
+        
     });
     // Lo reflejo en HTML
     total.innerHTML = `<p>TOTAL</p>
@@ -211,7 +259,7 @@ function recalcularTotal() {
     totalCompra = 0;
     if (carritoUsuario.length !== 0){
     carritoUsuario.forEach((producto) =>{
-        totalCompra = totalCompra + producto.subtotal;
+        totalCompra = parseFloat((totalCompra + producto.subtotal).toFixed(2));
     });
     totalElemento.textContent = `USD ${totalCompra}.-`;}
     else {
@@ -238,43 +286,6 @@ function finalizarCarrito() {
 }
 
 // *************************** EVENTOS ********************************* //
-
-// Tomo los productos dentro de listaProductos y los agrego al HTML
-let productos = document.querySelector('.listaProductos');
-// Recorro el array de productos
- listaProductos.forEach((producto) =>{
-    let articleProducto = document.createElement("article");
-    articleProducto.innerHTML = `
-    <img class="imagenProd" src="img/product_00${producto.id}.png" alt="${producto.nombre}">
-    <h4>${producto.nombre}</h4>
-    <p>USD ${producto.precio}.-</p>
-    <button class='agregarAlCarro operacionAgregar' data-id=${producto.id}>Agregar al carrito</button>
-    `;
-    // Agrego el article al section de listaProductos en el HTML
-    productos.appendChild(articleProducto);
-});
-
-// Agrego funcionalidad a los botones de agregar al carrito en la pagina principal.
-let botonesAgregar = document.querySelectorAll('.operacionAgregar');
-botonesAgregar.forEach((boton) => {
-    // Detecto evento click en cada boton.
-    boton.addEventListener('click', (e) => {
-        // Dentro de productoSeleccionado guardaré la informacion del producto clickeado.
-        // Comparo el id del producto con el id del boton clickeado.
-        const productoSeleccionado = listaProductos.find((producto) => producto.id === Number(e.target.dataset.id)); 
-        // Verifico si el producto ya se encuentra en el carrito
-        const productoExistente = carritoUsuario.find(p => p.id === productoSeleccionado.id);
-        if (productoExistente) {
-            // Si ya existe, aumento la cantidad de productos en el carrito.
-            productoExistente.agregarProducto();
-        } else {
-            // Si no existe, lo inicializo en el carrito
-            const nuevoProducto = new ProductoCarrito(productoSeleccionado.id,productoSeleccionado.nombre,productoSeleccionado.precio);
-            carritoUsuario.push(nuevoProducto);
-            localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
-        }
-    });
-});
 
 // Alternar entre vista carrito/productos.
 
