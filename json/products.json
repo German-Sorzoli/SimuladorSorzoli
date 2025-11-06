@@ -2,61 +2,61 @@
     {
         "id":1,
         "nombre":"Super Mario Bros.™ Wonder",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":59.99
     },
     {
         "id":2,
         "nombre":"Leyendas Pokémon™: Z-A",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":69.99
     },
     {
         "id":3,
         "nombre":"Mario Kart™ World",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":79.99
     },
     {
         "id":4,
         "nombre":"Donkey Kong™ Bananza",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":69.99
     },
     {
         "id":5,
         "nombre":"Bayonetta™ 3",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":59.99
     },
     {
         "id":6,
         "nombre":"Animal Crossing™: New Horizons",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":59.99
     },
     {
         "id":7,
         "nombre":"Fire Emblem Warriors™: Three Hopes",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":59.99
     },
     {
         "id":8,
         "nombre":"Kirby™ and the Forgotten Land",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":79.99
     },
     {
         "id":9,
         "nombre":"Metroid Prime™ 4: Beyond",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":59.99
     },
     {
         "id":10,
         "nombre":"The Legend of Zelda™: Tears of the Kingdom",
-        "consola": "Nintendo Switch",
+        "consola": "Nintendo Switch 2",
         "precio":69.99
     },
         {

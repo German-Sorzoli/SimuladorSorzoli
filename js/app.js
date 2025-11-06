@@ -50,6 +50,8 @@ class ProductoCarrito{
 
 let listaProductos=[];
 
+let listaOrdenada=[];
+
 // Defino un array de objetos que contendrá los productos agregados al carrito.
 let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p => Object.assign(new ProductoCarrito(p.id, p.nombre, p.precio), p));
 // Si ya hay informacion en el navegador, tomara esos datos, sino se iniciará vacío.
@@ -67,8 +69,8 @@ const buscarListaProductosJSON = async () => {
     try{
         const response = await fetch('./json/products.json');
         const data = await response.json();
-        listaProductos = data;
-        mostrarProductosHTML();
+        listaProductos = listaOrdenada = data;
+        mostrarProductosHTML(listaProductos);
     } catch (error){
         console.log(error);
     }
@@ -78,11 +80,13 @@ const buscarListaProductosJSON = async () => {
 buscarListaProductosJSON();
 
 // Funcion para mostrar los productos en el HTML
-function mostrarProductosHTML(){
+function mostrarProductosHTML(listado){
     // Tomo los productos dentro de listaProductos y los agrego al HTML
     let productos = document.querySelector('.listaProductos');
+    //Reinicio el espacio donde se renderizaran los productos
+    productos.innerHTML='';
     // Recorro el array que ahora contiene a los productos obtenidos del JSON
-    listaProductos.forEach((producto) =>{
+    listado.forEach((producto) =>{
         let articleProducto = document.createElement("article");
         articleProducto.innerHTML = `
         <img class="imagenProd" src="img/product_00${producto.id}.png" alt="${producto.nombre}">
@@ -100,7 +104,7 @@ function mostrarProductosHTML(){
         boton.addEventListener('click', (e) => {
             // Dentro de productoSeleccionado guardaré la informacion del producto clickeado.
             // Comparo el id del producto con el id del boton clickeado.
-            const productoSeleccionado = listaProductos.find((producto) => producto.id === Number(e.target.dataset.id)); 
+            const productoSeleccionado = listado.find((producto) => producto.id === Number(e.target.dataset.id)); 
             // Verifico si el producto ya se encuentra en el carrito
             const productoExistente = carritoUsuario.find(p => p.id === productoSeleccionado.id);
             if (productoExistente) {
@@ -112,6 +116,17 @@ function mostrarProductosHTML(){
                 carritoUsuario.push(nuevoProducto);
                 localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
             }
+            // Al agregar producto creo notificacion de toastify
+            Toastify({
+            text: "⬆ Producto agregado",
+            duration: 2000,
+            newWindow: true,
+            close: true,
+            gravity: "top",
+            position: "right",
+            className: "mi-toast",
+            onClick: function(){window.scrollTo({ top: 0, behavior: "smooth" });} 
+            }).showToast();
         });
     });
 }
@@ -250,6 +265,20 @@ function vaciarCarrito(){
     carritoUsuario = [];
     totalCompra = 0;
     localStorage.removeItem("CarritoTG");
+    // Al vaciar el carrito genero notificacion
+        Toastify({
+        text: "El carrito esta vacío",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "top",
+        position: "right",
+        style: {
+            background: "linear-gradient(to right, #999999ff, #414141ff)",
+            borderRadius: "30px",
+        },
+        onClick: function(){} 
+        }).showToast();
     carritoVacio();
 }
 
@@ -285,6 +314,23 @@ function finalizarCarrito() {
     localStorage.removeItem("CarritoTG");
 }
 
+// Funciones de ordenamiento  y filtro de productos
+
+function ordernarProductosPor(objetos,orden) {
+    listaOrdenada = objetos.slice();
+    listaOrdenada.sort((a,b)=> { 
+        if (a.nombre > b.nombre){return (1 * orden)}
+        if (a.nombre < b.nombre){return (-1 * orden)}
+        return 0;
+    })
+};
+
+function filtrarProductos(objetos,consola) {
+    listaOrdenada = objetos.slice();
+    listaOrdenada = listaOrdenada.filter(prod => prod.consola === consola)
+    mostrarProductosHTML(listaOrdenada);
+};
+
 // *************************** EVENTOS ********************************* //
 
 // Alternar entre vista carrito/productos.
@@ -297,6 +343,11 @@ let articulosProductos = document.querySelector('.listaProductos');
 let productosEnCarrito = document.querySelector('.listaCarrito');
 // Variable para texto contextual de la sección.
 let infoSeccion = document.querySelector('h3');
+// Variable para el carousel
+let carouselVisible = document.querySelector('#carousel-news');
+// Variable para los filtros de busqueda
+let filtrosDeBusqueda = document.querySelector('.filtrosDeBusqueda');
+
 
 carritoYProductos.addEventListener('click', () => {
     // Agrego clase con estilo del boton
@@ -306,7 +357,9 @@ carritoYProductos.addEventListener('click', () => {
         carritoYProductos.classList.add('volverHome');
         // Oculto productos y muestro carrito
         articulosProductos.classList.add('oculto');
+        carouselVisible.classList.add('oculto');
         productosEnCarrito.classList.remove('oculto');
+        filtrosDeBusqueda.classList.add('oculto');
         infoSeccion.innerText = "Estos son los productos en tu carrito:";
         // Ejecuto la funcion para mostrar el carrito con los productos.
         mostrarCarrito();
@@ -319,6 +372,69 @@ carritoYProductos.addEventListener('click', () => {
         articulosProductos.classList.remove('oculto');
         productosEnCarrito.classList.add('oculto');
         productosEnCarrito.classList.remove('compraFinalizada');
+        carouselVisible.classList.remove('oculto');
+        filtrosDeBusqueda.classList.remove('oculto');
         infoSeccion.innerText = "Elige entre nuestros productos";
     }
 });
+
+// Eventos para modos de ordenar
+
+const seleccionarOrden = document.getElementById("SeleccionOrden");
+
+seleccionarOrden.addEventListener('change', (e) => {
+    const valorSeleccionado = e.target.value;
+    if (valorSeleccionado === "asc") {
+        ordernarProductosPor(listaOrdenada,1);
+    } 
+    else if (valorSeleccionado === "desc") {
+       ordernarProductosPor(listaOrdenada,-1);
+    } 
+    mostrarProductosHTML(listaOrdenada);
+});
+
+const seleccionarConsola = document.getElementById("SeleccionConsola");
+seleccionarConsola.addEventListener('change', (e) => {
+    const valorSeleccionado = e.target.value;
+    switch (valorSeleccionado){
+        case "PS5": filtrarProductos(listaProductos,"PlayStation 5");break;
+        case "XBS": filtrarProductos(listaProductos,"Xbox Series");break;
+        case "NS2": filtrarProductos(listaProductos,"Nintendo Switch 2");break;
+        case "ALL": listaOrdenada = listaProductos;mostrarProductosHTML(listaOrdenada);break;
+    } 
+});
+
+
+// const swalWithBootstrapButtons = Swal.mixin({
+//   customClass: {
+//     confirmButton: "btn btn-success",
+//     cancelButton: "btn btn-danger"
+//   },
+//   buttonsStyling: false
+// });
+// swalWithBootstrapButtons.fire({
+//   title: "Are you sure?",
+//   text: "You won't be able to revert this!",
+//   icon: "warning",
+//   showCancelButton: true,
+//   confirmButtonText: "Yes, delete it!",
+//   cancelButtonText: "No, cancel!",
+//   reverseButtons: true
+// }).then((result) => {
+//   if (result.isConfirmed) {
+//     swalWithBootstrapButtons.fire({
+//       title: "Deleted!",
+//       text: "Your file has been deleted.",
+//       icon: "success"
+//     });
+//   } else if (
+//     /* Read more about handling dismissals below */
+//     result.dismiss === Swal.DismissReason.cancel
+//   ) {
+//     swalWithBootstrapButtons.fire({
+//       title: "Cancelled",
+//       text: "Your imaginary file is safe :)",
+//       icon: "error"
+//     });
+//   }
+// });
