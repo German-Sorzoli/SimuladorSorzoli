@@ -1,7 +1,7 @@
 // *************************** CLASES ********************************* //
 
 // Creo la Clase Producto Carrito que deriva de la informacion del listado de productos.
-// Esto agregará una nueva propiedad de si existe, cantidad de productos y subtotal por cada elemento.
+// Esto agregará una nueva propiedad de si "existe", "cantidad" de productos y "subtotal" por cada elemento.
 
 class ProductoCarrito{
 
@@ -48,8 +48,9 @@ class ProductoCarrito{
 
 // *************************** VARIABLES ********************************* //
 
+// Guardo la infomacion de productos del JSON original
 let listaProductos=[];
-
+// Una vez utilizado, guardo la informacion en un nuevo array de objetos para su manipulacion
 let listaOrdenada=[];
 
 // Defino un array de objetos que contendrá los productos agregados al carrito.
@@ -155,8 +156,8 @@ function mostrarCarrito (){
             <p><b>${producto.nombre}</b></p>
             <p>USD ${producto.precio}.-</p>
             <div><p class="cantidad-id-${producto.id}">${producto.cantidad}</p>
-            <button class='agregarUnProducto' data-id=${producto.id}>+</button>
-            <button class='sacarUnProducto' data-id=${producto.id}>-</button></div>
+            <button class='miniBoton agregarUnProducto' data-id=${producto.id}>+</button>
+            <button class='miniBoton sacarUnProducto' data-id=${producto.id}>-</button></div>
             <p>USD ${producto.subtotal}.-</p>
             `;
             // Agrego estilos al articulo
@@ -246,18 +247,196 @@ function calcularTotal (){
     botonVaciar.classList.add("botones");
     botonVaciar.classList.add("operacionVaciar");
     botonVaciar.addEventListener('click', () => {
-        vaciarCarrito();})
+        // Librería de SweetAlert2
+        // Confirmo al usuario si quiere vaciar su carrito
+        Swal.fire({
+        title: "¿Deseas vaciar el carrito?",
+        text: "Eliminaras todos tus productos.",
+        icon: "question",
+        customClass: {
+            popup: 'vaciarPopup',
+            title: 'vaciarTitulo',
+            confirmButton: 'vaciarConfirm',
+            cancelButton: 'vaciarConfirm',
+        },
+        showCancelButton: true,
+        confirmButtonColor: "rgb(107, 194, 21)",
+        cancelButtonColor: "rgba(122, 122, 122, 1)",
+        confirmButtonText: "Si",
+        cancelButtonText: "No",
+        }).then((result) => {
+            if (result.isConfirmed) { // Si confirma, se vacia el carrito
+                Swal.fire({
+                title: "Carrito vacío.",
+                text: "Ya no tenes productos en tu carrito.",
+                icon: "warning",
+                customClass:{
+                    popup: 'vaciarPopup',
+                    title: 'vaciarTitulo',
+                    confirmButton:'vaciarConfirm',
+                },
+                confirmButtonColor: "rgb(107, 194, 21)",
+                });
+                vaciarCarrito()
+            }
+        });
+    ;})
     espacioBotones.appendChild(botonVaciar);
 
-    // Agrego boton de finalizar la compra
-    let botonFinalizar = document.createElement("button");
-    botonFinalizar.innerHTML = `FINALIZAR COMPRA`;
-    botonFinalizar.classList.add("botones");
-    botonFinalizar.classList.add("operacionFinalizar");
-    botonFinalizar.addEventListener('click', () => {
-        finalizarCarrito();})
-        espacioBotones.appendChild(botonFinalizar);
+    // Agrego boton de "siguiente" para continuar con la compra
+    let botonContinuar = document.createElement("button");
+    botonContinuar.innerHTML = `CONTINUAR COMPRA`;
+    botonContinuar.classList.add("botones");
+    botonContinuar.classList.add("operacionContinuar");
+    botonContinuar.addEventListener('click', () => {
+        botonContinuar.classList.add('oculto');
+        botonVaciar.classList.add('oculto');
+        completarFormularioCompra();})
+        espacioBotones.appendChild(botonContinuar);
 };
+
+
+function completarFormularioCompra(){
+        // Almaceno el elemento de la clase listaCarrito.
+        let ocultarMiniBotones = document.querySelectorAll('.miniBoton');
+        ocultarMiniBotones.forEach((boton)=>{
+                boton.classList.add('oculto');
+        })
+        let listadoDefinitivo = document.querySelector('.listaCarrito');
+        let formularioCompra = document.createElement("article");
+        formularioCompra.innerHTML = `
+        <h3>Por favor completa con tus datos: <br><br></h3>
+        <form class="">
+            <div class="form-row formularioCompra">
+                <div class="form-group">
+                <label for="inputName">Nombre</label>
+                <input type="text" class="form-control" id="inputName" value="Germán Luis">
+                </div>
+                
+                <div class="form-group">
+                <label for="inputSurname">Apellido</label>
+                <input type="text" class="form-control" id="inputSurame" value="Sorzoli">
+                </div>
+
+                <div class="form-group">
+                <label for="inputAddress">Domicilio</label>
+                <input type="text" class="form-control" id="inputAddress" value="Calle Falsa 123">
+                </div>
+
+                <div class="form-group">
+                <label for="inputCountry">Pais</label>
+                <select id="inputCountry" class="form-control" >
+                    <option>Elegi Pais...</option>
+                    <option selected value="AR">Argentina</option>
+                </select>
+                </div>
+
+                <div class="form-group">
+                <label for="inputState">Provincia</label>
+                <select id="inputState" class="form-control">
+                    <option>Elegi Provincia...</option>
+                    <option selected value="CA">Ciudad Autónoma de Buenos Aires</option>
+                    <option value="BA">Buenos Aires</option>
+                    <option value="CT">Catamarca</option>
+                    <option value="CH">Chaco</option>
+                    <option value="CHU">Chubut</option>
+                    <option value="CC">Corrientes</option>
+                    <option value="CC">Córdoba</option>
+                    <option value="ER">Entre Ríos</option>
+                    <option value="FO">Formosa</option>
+                    <option value="JU">Jujuy</option>
+                    <option value="LP">La Pampa</option>
+                    <option value="LR">La Rioja</option>
+                    <option value="MZ">Mendoza</option>
+                    <option value="MI">Misiones</option>
+                    <option value="NE">Neuquén</option>
+                    <option value="RN">Río Negro</option>
+                    <option value="SA">Salta</option>
+                    <option value="SJ">San Juan</option>
+                    <option value="SL">San Luis</option>
+                    <option value="SR">Santa Cruz</option>
+                    <option value="SF">Santa Fe</option>
+                    <option value="SD">Santiago del Estero</option>
+                    <option value="TF">Tierra del Fuego</option>  
+                </select>
+                </div>
+
+                <div class="form-group">
+                <label for="inputCity">Ciudad</label>
+                <input type="text" class="form-control" id="inputCity" value="CABA">
+                </div>
+
+                <div class="form-group">
+                <label for="inputZip">Código Postal</label>
+                <input type="text" class="form-control" id="inputZip" value="1234">
+                </div>
+                <div></div>
+                <div class="form-group">
+                <label for="inputCard">Número de tarjeta</label>
+                <input type="text" class="form-control" id="inputCard" value="1234 5678 9101 1121">
+                </div>
+                
+                <div class="form-group">
+                <label for="inputDate">Fecha de vencimiento</label>
+                <input type="date" class="form-control" id="inputDate" value="2032-01-01">
+                </div>
+
+                <div class="form-group">
+                <label for="inputCode">Codigo de Verificación</label>
+                <input type="password" class="form-control" id="inputCode" value="123">
+                </div>
+
+                <div class="form-group">
+                <label for="inputmail">E-mail</label>
+                <input type="text" class="form-control" id="inputmail" value="glsorzoli@gmail.com">
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="gridCheck" checked>
+                    <label class="form-check-label" for="gridCheck">
+                        Enviar notificaciones sobre mi pedido.
+                    </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+        <article class="botonesFinalizarCompra">
+            <button type="submit" class="botonAtras">ATRAS</button>
+            <button type="submit" class="operacionFinalizar">COMPRAR</button>
+        </article>`
+        listadoDefinitivo.appendChild(formularioCompra);
+        let botonAtras = document.querySelector('.botonAtras')
+        botonAtras.addEventListener('click', () => {
+            mostrarCarrito();
+            });
+        let botonComprar = document.querySelector('.operacionFinalizar')
+        botonComprar.addEventListener('click', () => {
+            // Librería de SweetAlert2
+            // Confirmo al usuario si quiere concretar la compra
+            Swal.fire({
+            title: "¿Finalizar compra?",
+            icon: "question",
+            customClass: {
+                popup: 'vaciarPopup',
+                title: 'vaciarTitulo',
+                confirmButton: 'vaciarConfirm',
+                cancelButton: 'vaciarConfirm',
+            },
+            showCancelButton: true,
+            confirmButtonColor: "rgb(107, 194, 21)",
+            cancelButtonColor: "rgba(122, 122, 122, 1)",
+            confirmButtonText: "Si",
+            cancelButtonText: "No",
+            }).then((result) => {
+                if (result.isConfirmed) { // Si confirma, se vacia el carrito
+                    finalizarCarrito();
+                }
+            });
+        ;})
+}
+
 
 // Funcion que elimina todos los productos del carrito
 function vaciarCarrito(){
@@ -306,6 +485,17 @@ let mensajeVacio = document.querySelector('.listaCarrito');
 
 // Al finalizar la compra se muestra un mensaje en pantalla
 function finalizarCarrito() {
+    Swal.fire({
+        title: "¡Tu compra se concretó con éxito!",
+        icon: "success",
+        customClass: {
+            popup: 'vaciarPopup',
+            title: 'vaciarTitulo',
+            confirmButton: 'vaciarConfirm',
+        },
+        confirmButtonColor: "rgb(107, 194, 21)",
+        confirmButtonText: "OK",
+        });
     let mensajeFin = document.querySelector('.listaCarrito');
     mensajeFin.innerHTML = `<h4>¡Tu compra se concretó con éxito!</h4>
     <p><br>Muchas gracias por comprar en nuestra tienda, tus productos llegarán a la brevedad</P>`;
@@ -355,6 +545,7 @@ carritoYProductos.addEventListener('click', () => {
         // Si se encuentra en modo productos, muestra el carrito
         carritoYProductos.innerText = "Volver a Productos";
         carritoYProductos.classList.add('volverHome');
+        carritoYProductos.classList.remove('verCarrito');
         // Oculto productos y muestro carrito
         articulosProductos.classList.add('oculto');
         carouselVisible.classList.add('oculto');
@@ -368,6 +559,7 @@ carritoYProductos.addEventListener('click', () => {
     else if(carritoYProductos.innerText == "Volver a Productos"){
         carritoYProductos.innerText = "Ver carrito";
         carritoYProductos.classList.remove('volverHome');
+        carritoYProductos.classList.add('verCarrito');
         // Oculto carrito y muestro productos
         articulosProductos.classList.remove('oculto');
         productosEnCarrito.classList.add('oculto');
@@ -380,16 +572,19 @@ carritoYProductos.addEventListener('click', () => {
 
 // Eventos para modos de ordenar
 
+// Orden ascendente y descendente
+// el valor de "orden" sera de 1 para ascendente y -1 para descendente.
 const seleccionarOrden = document.getElementById("SeleccionOrden");
-
 seleccionarOrden.addEventListener('change', (e) => {
+    // Toma los valores de las opciones y evalua segun el caso
     const valorSeleccionado = e.target.value;
     if (valorSeleccionado === "asc") {
         ordernarProductosPor(listaOrdenada,1);
     } 
     else if (valorSeleccionado === "desc") {
        ordernarProductosPor(listaOrdenada,-1);
-    } 
+    }
+    // Independientemente del caso, muestro los productos ordenados.
     mostrarProductosHTML(listaOrdenada);
 });
 
@@ -401,40 +596,5 @@ seleccionarConsola.addEventListener('change', (e) => {
         case "XBS": filtrarProductos(listaProductos,"Xbox Series");break;
         case "NS2": filtrarProductos(listaProductos,"Nintendo Switch 2");break;
         case "ALL": listaOrdenada = listaProductos;mostrarProductosHTML(listaOrdenada);break;
-    } 
+    }
 });
-
-
-// const swalWithBootstrapButtons = Swal.mixin({
-//   customClass: {
-//     confirmButton: "btn btn-success",
-//     cancelButton: "btn btn-danger"
-//   },
-//   buttonsStyling: false
-// });
-// swalWithBootstrapButtons.fire({
-//   title: "Are you sure?",
-//   text: "You won't be able to revert this!",
-//   icon: "warning",
-//   showCancelButton: true,
-//   confirmButtonText: "Yes, delete it!",
-//   cancelButtonText: "No, cancel!",
-//   reverseButtons: true
-// }).then((result) => {
-//   if (result.isConfirmed) {
-//     swalWithBootstrapButtons.fire({
-//       title: "Deleted!",
-//       text: "Your file has been deleted.",
-//       icon: "success"
-//     });
-//   } else if (
-//     /* Read more about handling dismissals below */
-//     result.dismiss === Swal.DismissReason.cancel
-//   ) {
-//     swalWithBootstrapButtons.fire({
-//       title: "Cancelled",
-//       text: "Your imaginary file is safe :)",
-//       icon: "error"
-//     });
-//   }
-// });

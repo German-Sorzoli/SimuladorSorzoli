@@ -60,7 +60,7 @@ header #main_nav .container-fluid .navbar-nav li a{
     padding-bottom:1em;
 }
 
-h2{
+.carousel-text{
     padding:.5em;
     font-family: "Fredoka", sans-serif;
     text-align:center;
@@ -82,17 +82,29 @@ header .verCarrito{
     font-size:1em;
     font-weight: 600;
     padding:.5em 1em;
+    margin-left: 3em;;
 }
 header .verCarrito:hover{
     background-color:rgb(75, 146, 4);
+    box-shadow: 0 0 1em rgb(1, 141, 55);
+    transition: all 0.2s ease-in-out;
 }
 
 header .volverHome{ 
     background-color:rgb(160, 160, 160);
+    border-width: 0;
+    border-radius:30px;
     color:white;
     font-size:1em;
     font-weight: 600;
     padding:.5em 1em;
+    margin-left: 3em;
+}
+
+header .volverHome:hover{
+    background-color:rgb(255, 146, 45);
+    box-shadow: 0 0 1em rgb(231, 114, 3);
+    transition: all 0.2s ease-in-out;
 }
 
 .agregarAlCarro{
@@ -107,14 +119,15 @@ header .volverHome{
 
 .agregarAlCarro:hover{
     background-color:rgb(214, 61, 0);
+    box-shadow: 0 0 1em red;
     font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
 article .agregarUnProducto, .sacarUnProducto{
     margin: 0 0 1em 0;
     background-color: rgb(157, 192, 255);
-    border-color: rgb(68, 68, 155);
-    border-radius:1em;
+    border: 0;
     width:1.5em;
     height:1.5em;
     font-size:1.3em;
@@ -177,7 +190,7 @@ body .listaCarrito .productoEnCarrito div{
     font: size 1.5em;
 }
 
-.listaCarrito .espacioBotones{
+.listaCarrito .espacioBotones, .botonesFinalizarCompra{
     padding-top:2em;
     display:flex;
     justify-content: space-between;
@@ -188,16 +201,24 @@ body .listaCarrito .productoEnCarrito div{
     border-radius:2em;
 }
 
-.operacionVaciar{
+.operacionVaciar, .botonAtras{
     width:8em;
     padding: .5em .5em;
-    border-color:lightgray;
+    border:0;
     background-color: white;
+}
+
+.operacionContinuar{
+    padding: .5em 1.5em;
+    border:0;
+    color:white;
+    font-weight: 600;
+    background-color: rgb(255, 148, 49);
 }
 
 .operacionFinalizar{
     padding: .5em 1.5em;
-    border-color:brown;
+    border:0;
     color:white;
     font-weight: 600;
     background-color: red;
@@ -241,9 +262,25 @@ h4{
 .mi-toast{
 background: linear-gradient(to right, rgb(107, 194, 21), rgb(75, 146, 4))!important;
 border-radius: 30px !important;
+box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.5)!important;
 }
 
 .selectoresOrden{
     width:30%;
     height:2em;
+}
+
+.vaciarPopup {
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.vaciarConfirm {
+    border-radius: 10px;
+}
+
+.formularioCompra{
+    display:grid;
+    grid-template-columns: auto auto;
+    gap: 2em;
 }
