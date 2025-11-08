@@ -10,17 +10,18 @@ class ProductoCarrito{
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
+        this.consola = consola;
         this.existe = true;
         this.cantidad = 1;
         // Calculo de subtotal con 2 decimales.
-        this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
+        this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));
     }
 
     // Creo funcionalidad de agregar un producto existente al carrito
     agregarProducto(){
     this.cantidad++;
     // Calculo de subtotal con 2 decimales.
-    this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
+    this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));
     // Guardo en Local Storage
     localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
     }
@@ -54,7 +55,7 @@ let listaProductos=[];
 let listaOrdenada=[];
 
 // Defino un array de objetos que contendrá los productos agregados al carrito.
-let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p => Object.assign(new ProductoCarrito(p.id, p.nombre, p.precio), p));
+let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p => Object.assign(new ProductoCarrito(p.id, p.nombre, p.consola, p.precio), p));
 // Si ya hay informacion en el navegador, tomara esos datos, sino se iniciará vacío.
 // Necesito resetear los objetos planos que recupero de LocalStore y re-convertirlos a elementos de la clase ProductoCarrito para mantener su funcionalidad.
 
@@ -73,11 +74,25 @@ const buscarListaProductosJSON = async () => {
         listaProductos = listaOrdenada = data;
         mostrarProductosHTML(listaProductos);
     } catch (error){
-        console.log(error);
+        // En caso de no poder contactar al servidor, saldra un alerta informandolo
+        // SweetAlert2
+        Swal.fire({
+        title: "Error de conexión",
+        text: "No se pudo contactar al servidor. Intentelo mas tarde.",
+        icon: "error",
+        customClass: {
+            popup: 'vaciarPopup',
+            title: 'vaciarTitulo',
+            confirmButton: 'vaciarConfirm',
+            cancelButton: 'vaciarConfirm',
+        },
+        confirmButtonColor: "rgba(80, 80, 80, 1)",
+        confirmButtonText: "Ok",
+        });
     }
 }
 
-// Ejecuto la funcion
+// Ejecuto la funcion para completar el listado de productos.
 buscarListaProductosJSON();
 
 // Funcion para mostrar los productos en el HTML
@@ -88,6 +103,7 @@ function mostrarProductosHTML(listado){
     productos.innerHTML='';
     // Recorro el array que ahora contiene a los productos obtenidos del JSON
     listado.forEach((producto) =>{
+        // Creo un articulo por cada uno
         let articleProducto = document.createElement("article");
         articleProducto.innerHTML = `
         <img class="imagenProd" src="img/product_00${producto.id}.png" alt="${producto.nombre}">
@@ -115,6 +131,7 @@ function mostrarProductosHTML(listado){
                 // Si no existe, lo inicializo en el carrito
                 const nuevoProducto = new ProductoCarrito(productoSeleccionado.id,productoSeleccionado.nombre,productoSeleccionado.consola,productoSeleccionado.precio);
                 carritoUsuario.push(nuevoProducto);
+                // Lo guardo ademas en local store
                 localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
             }
             // Al agregar producto creo notificacion de toastify
@@ -306,26 +323,26 @@ function completarFormularioCompra(){
         let formularioCompra = document.createElement("article");
         formularioCompra.innerHTML = `
         <h3>Por favor completa con tus datos: <br><br></h3>
-        <form class="">
+        <form id="miForm">
             <div class="form-row formularioCompra">
                 <div class="form-group">
                 <label for="inputName">Nombre</label>
-                <input type="text" class="form-control" id="inputName" value="Germán Luis">
+                <input type="text" class="form-control" id="inputName" name="nombre" value="Germán Luis">
                 </div>
                 
                 <div class="form-group">
-                <label for="inputSurname">Apellido</label>
-                <input type="text" class="form-control" id="inputSurame" value="Sorzoli">
+                <label for="inputSurame">Apellido</label>
+                <input type="text" class="form-control" id="inputSurame" name="apellido" value="Sorzoli">
                 </div>
 
                 <div class="form-group">
                 <label for="inputAddress">Domicilio</label>
-                <input type="text" class="form-control" id="inputAddress" value="Calle Falsa 123">
+                <input type="text" class="form-control" id="inputAddress" name="domicilio" value="Calle Falsa 123">
                 </div>
 
                 <div class="form-group">
                 <label for="inputCountry">Pais</label>
-                <select id="inputCountry" class="form-control" >
+                <select id="inputCountry" class="form-control" name="pais">
                     <option>Elegi Pais...</option>
                     <option selected value="AR">Argentina</option>
                 </select>
@@ -333,7 +350,7 @@ function completarFormularioCompra(){
 
                 <div class="form-group">
                 <label for="inputState">Provincia</label>
-                <select id="inputState" class="form-control">
+                <select id="inputState" class="form-control" name="provincia">
                     <option>Elegi Provincia...</option>
                     <option selected value="CA">Ciudad Autónoma de Buenos Aires</option>
                     <option value="BA">Buenos Aires</option>
@@ -341,7 +358,7 @@ function completarFormularioCompra(){
                     <option value="CH">Chaco</option>
                     <option value="CHU">Chubut</option>
                     <option value="CC">Corrientes</option>
-                    <option value="CC">Córdoba</option>
+                    <option value="CB">Córdoba</option>
                     <option value="ER">Entre Ríos</option>
                     <option value="FO">Formosa</option>
                     <option value="JU">Jujuy</option>
@@ -363,37 +380,37 @@ function completarFormularioCompra(){
 
                 <div class="form-group">
                 <label for="inputCity">Ciudad</label>
-                <input type="text" class="form-control" id="inputCity" value="CABA">
+                <input type="text" class="form-control" id="inputCity" name="ciudad" value="CABA">
                 </div>
 
                 <div class="form-group">
                 <label for="inputZip">Código Postal</label>
-                <input type="text" class="form-control" id="inputZip" value="1234">
+                <input type="text" class="form-control" id="inputZip" name="codigoPostal" value="1234">
                 </div>
                 <div></div>
                 <div class="form-group">
                 <label for="inputCard">Número de tarjeta</label>
-                <input type="text" class="form-control" id="inputCard" value="1234 5678 9101 1121">
+                <input type="text" class="form-control" id="inputCard" name="numeroTarjeta" value="1234 5678 9101 1121">
                 </div>
                 
                 <div class="form-group">
                 <label for="inputDate">Fecha de vencimiento</label>
-                <input type="date" class="form-control" id="inputDate" value="2032-01-01">
+                <input type="date" class="form-control" id="inputDate" name="fechaVencimiento" value="2032-01-01">
                 </div>
 
                 <div class="form-group">
                 <label for="inputCode">Codigo de Verificación</label>
-                <input type="password" class="form-control" id="inputCode" value="123">
+                <input type="password" class="form-control" id="inputCode" name="codigoTarjeta" value="123">
                 </div>
 
                 <div class="form-group">
-                <label for="inputmail">E-mail</label>
-                <input type="text" class="form-control" id="inputmail" value="glsorzoli@gmail.com">
+                <label for="inputMail">E-mail</label>
+                <input type="text" class="form-control" id="inputMail" name="email" value="glsorzoli@gmail.com">
                 </div>
 
                 <div class="form-group">
                     <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="gridCheck" checked>
+                    <input class="form-check-input" type="checkbox" id="gridCheck" name="notificaciones" checked>
                     <label class="form-check-label" for="gridCheck">
                         Enviar notificaciones sobre mi pedido.
                     </label>
@@ -403,7 +420,7 @@ function completarFormularioCompra(){
         </form>
         </div>
         <article class="botonesFinalizarCompra">
-            <button type="submit" class="botonAtras">ATRAS</button>
+            <button type="cancelButton" class="botonAtras">ATRAS</button>
             <button type="submit" class="operacionFinalizar">COMPRAR</button>
         </article>`
         listadoDefinitivo.appendChild(formularioCompra);
@@ -411,8 +428,17 @@ function completarFormularioCompra(){
         botonAtras.addEventListener('click', () => {
             mostrarCarrito();
             });
-        let botonComprar = document.querySelector('.operacionFinalizar')
-        botonComprar.addEventListener('click', () => {
+        let botonComprar = document.querySelector('.operacionFinalizar');
+        botonComprar.addEventListener('click', (event) => {
+            // Envio Formulario con carrito listo para finalizar para historial de compras
+            event.preventDefault();
+            const formulario = document.querySelector('#miForm');
+            const datos = new FormData(formulario);
+            const datosCompletos = Object.fromEntries(datos.entries());
+            const datosFinales = {
+                cliente: datosCompletos,
+                carrito: carritoUsuario,
+                }
             // Librería de SweetAlert2
             // Confirmo al usuario si quiere concretar la compra
             Swal.fire({
@@ -430,13 +456,19 @@ function completarFormularioCompra(){
             confirmButtonText: "Si",
             cancelButtonText: "No",
             }).then((result) => {
-                if (result.isConfirmed) { // Si confirma, se vacia el carrito
-                    finalizarCarrito();
+                if (result.isConfirmed) { // Si confirma:
+                    // Guardo el formulario con la informacion de la compra y el formulario
+                    let historialCompras = JSON.parse(localStorage.getItem("historialCompras")) || [];
+                    historialCompras.push(datosFinales);
+                    localStorage.setItem("historialCompras", JSON.stringify(historialCompras));
+                    // Muestro mensaje de finalizado
+                    finalizarCarrito(); 
                 }
             });
         ;})
 }
 
+// Funcion para guardar los datos del formulario de compra en un archivo JSON local
 
 // Funcion que elimina todos los productos del carrito
 function vaciarCarrito(){
@@ -546,8 +578,9 @@ carritoYProductos.addEventListener('click', () => {
         carritoYProductos.innerText = "Volver a Productos";
         carritoYProductos.classList.add('volverHome');
         carritoYProductos.classList.remove('verCarrito');
-        // Oculto productos y muestro carrito
+        // Oculto productos y muestro carrito;
         articulosProductos.classList.add('oculto');
+        // articulosProductos.classList.add('oculto');
         carouselVisible.classList.add('oculto');
         productosEnCarrito.classList.remove('oculto');
         filtrosDeBusqueda.classList.add('oculto');

@@ -284,3 +284,57 @@ box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.5)!important;
     grid-template-columns: auto auto;
     gap: 2em;
 }
+
+/* Media querys */
+
+@media screen and (max-width: 1500px) {
+
+    .img-carousel{
+        height:60vh;
+    }
+}
+
+@media screen and (max-width: 992px) {
+
+    .listaProductos{
+        grid-template-columns: 1fr 1fr;
+        gap:0 2em;
+    }
+
+    .img-carousel{
+        height:50vh;
+    }
+
+    .carousel-text{
+        padding:.5em;
+        font-weight:500;
+        font-size:3em;
+        text-shadow: 0 0 5px black;
+    }
+
+    .formularioCompra{
+        grid-template-columns: auto;
+        gap: 2em;
+    }
+
+}
+
+@media screen and (max-width: 576px) {
+
+    .listaProductos{
+        grid-template-columns: 1fr;
+        gap:0 2em;
+    }
+
+    .carousel-text{
+        padding:0;
+        font-weight:500;
+        font-size:1em;
+        text-shadow: 0 0 5px black;
+    }
+
+    h1{
+        font-size:1.1em!important;
+    }
+
+}
