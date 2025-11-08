@@ -1,49 +1,49 @@
 // *************************** CLASES ********************************* //
 
 // Creo la Clase Producto Carrito que deriva de la informacion del listado de productos.
-// Esto agregará una nueva propiedad de si "existe", "cantidad" de productos y "subtotal" por cada elemento.
+// Esto agregará una nueva propiedad de "cantidad" de productos y "subtotal" por cada elemento.
 
 class ProductoCarrito{
 
-    // Genero una entrade de producto al carrito
+    // Constructor
     constructor(id,nombre,consola,precio){
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.consola = consola;
-        this.existe = true;
         this.cantidad = 1;
         // Calculo de subtotal con 2 decimales.
+        this.actualizarSubtotal();
+    }
+
+    // Subtotal
+    actualizarSubtotal(){
         this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));
     }
 
-    // Creo funcionalidad de agregar un producto existente al carrito
-    agregarProducto(){
-    this.cantidad++;
-    // Calculo de subtotal con 2 decimales.
-    this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));
-    // Guardo en Local Storage
-    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
-    }
-
-    // Creo funcionalidad de restar un producto existente al carrito
-    restarProducto(){
-        if(this.cantidad>1 && this.existe)
-            {this.cantidad--;
-            this.subtotal = parseFloat((this.precio * this.cantidad).toFixed(2));;
-            }
-            //Si la cantidad llega a 0, elimino la entrada en el carrito
-        else {
-            this.cantidad=0;
-            this.existe=false;
-            // Lo elimino del HTML
-            let indexToDelete = carritoUsuario.findIndex(p => p.id === this.id);
-            carritoUsuario.splice(indexToDelete,1);
-            // Actualizo pantalla
-            mostrarCarrito();
+    // Cantidades
+    guardarCarrito(accion){
+        if(accion ==='agregar'){
+            this.cantidad++;
         }
-        // Guardo en Local Storage
-        localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
+        else if(accion ==='restar'){
+            if(this.cantidad>1){
+                this.cantidad--;
+                }
+                //Si la cantidad llega a 0, elimino la entrada en el carrito
+            else {
+                this.cantidad=0;
+                // Lo elimino del HTML
+                let indexToDelete = carritoUsuario.findIndex(p => p.id === this.id);
+                carritoUsuario.splice(indexToDelete,1);
+                mostrarCarrito();
+            }
+        }
+        // Calculo de subtotal
+        this.actualizarSubtotal();
+        // Guardo en Local Storage           
+        guardarLocal();
+        // Actualizo pantalla
     }
 }
 
@@ -62,12 +62,60 @@ let carritoUsuario = (JSON.parse(localStorage.getItem("CarritoTG")) || []).map(p
 // Variable global que almacena el total del carrito
 let totalCompra = 0;
 
+// Variable que almacena el texto del boton, ya sea "Ver Carrito" o "Volver a Productos".
+let carritoYProductos = document.querySelector('.verCarrito');
+// Variable que almacena listado de productos en HTML.
+let articulosProductos = document.querySelector('.listaProductos');
+// Variable que almacena listado del carrito en HTML.
+let productosEnCarrito = document.querySelector('.listaCarrito');
+// Variable para texto contextual de la sección.
+let infoSeccion = document.querySelector('h3');
+// Variable para el carousel
+let carouselVisible = document.querySelector('#carousel-news');
+// Variable para los filtros de busqueda
+let filtrosDeBusqueda = document.querySelector('.filtrosDeBusqueda');
+// Variable para los botones de continuar y vaciar carrito
+let botonesCarrito = document.querySelector('.espacioBotones');
+
 // *************************** FUNCIONES ********************************* //
 
-// Funcion que trae los datos de los productos dentro del archivo products.json
-// Implementacion de asincronía.
+// Local Storage
+function guardarLocal(){
+    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
+}
 
-const buscarListaProductosJSON = async () => {
+// Total
+function totalCarrito(){
+    return carritoUsuario
+    .reduce((acc, p) => acc + p.subtotal, 0)
+    .toFixed(2);
+}
+
+// Vaciar Carrito
+function vaciarCarrito(){
+    // Reinicia variables globales.
+    carritoUsuario = [];
+    totalCompra = 0;
+    localStorage.removeItem("CarritoTG");
+    // Al vaciar el carrito genero notificacion
+        Toastify({
+        text: "El carrito esta vacío",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "top",
+        position: "right",
+        style: {
+            background: "linear-gradient(to right, #999999ff, #414141ff)",
+            borderRadius: "30px",
+        },
+        onClick: function(){} 
+        }).showToast();
+    carritoVacio();
+}
+
+// Recolectar productos del archivo products.json
+const buscarListaProductosJSON = async () => { // Implementacion de asincronía.
     try{
         const response = await fetch('./json/products.json');
         const data = await response.json();
@@ -92,10 +140,27 @@ const buscarListaProductosJSON = async () => {
     }
 }
 
-// Ejecuto la funcion para completar el listado de productos.
-buscarListaProductosJSON();
+// Orden de productos
+function ordernarProductosPor(objetos,orden) {
+    listaOrdenada = objetos.slice();
+    listaOrdenada.sort((a,b)=> { 
+        if (a.nombre > b.nombre){return (1 * orden)}
+        if (a.nombre < b.nombre){return (-1 * orden)}
+        return 0;
+    })
+};
 
-// Funcion para mostrar los productos en el HTML
+// Filtrar productos
+function filtrarProductos(objetos,consola) {
+    listaOrdenada = objetos.slice();
+    listaOrdenada = listaOrdenada.filter(prod => prod.consola === consola)
+    mostrarProductosHTML(listaOrdenada);
+};
+
+
+// *************************** RENDERIZACION ********************************* //
+
+//  Renderizar productos en el HTML y funcionalidades
 function mostrarProductosHTML(listado){
     // Tomo los productos dentro de listaProductos y los agrego al HTML
     let productos = document.querySelector('.listaProductos');
@@ -123,16 +188,16 @@ function mostrarProductosHTML(listado){
             // Comparo el id del producto con el id del boton clickeado.
             const productoSeleccionado = listado.find((producto) => producto.id === Number(e.target.dataset.id)); 
             // Verifico si el producto ya se encuentra en el carrito
-            const productoExistente = carritoUsuario.find(p => p.id === productoSeleccionado.id);
+            let productoExistente = carritoUsuario.find(p => p.id === productoSeleccionado.id);
             if (productoExistente) {
                 // Si ya existe, aumento la cantidad de productos en el carrito.
-                productoExistente.agregarProducto();
+                productoExistente.guardarCarrito('agregar');
             } else {
                 // Si no existe, lo inicializo en el carrito
                 const nuevoProducto = new ProductoCarrito(productoSeleccionado.id,productoSeleccionado.nombre,productoSeleccionado.consola,productoSeleccionado.precio);
                 carritoUsuario.push(nuevoProducto);
                 // Lo guardo ademas en local store
-                localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
+                guardarLocal();
             }
             // Al agregar producto creo notificacion de toastify
             Toastify({
@@ -149,12 +214,11 @@ function mostrarProductosHTML(listado){
     });
 }
 
-// Funcion principal para renderizar el listado del carrito.
+// Renderizar carrito y sus funciones
 function mostrarCarrito (){
+    totalCompra=0;
     // Siempre que el carrito tenga productos, lo muestro.
     if (carritoUsuario.length !== 0){
-        // Almaceno el elemento de la clase listaCarrito.
-        let productosEnCarrito = document.querySelector('.listaCarrito');
         // Armo estructura de columnas en mi HTML para mostrar los productos en el carrito
         productosEnCarrito.innerHTML = 
                 `<ul class="productoEnCarrito">
@@ -181,144 +245,45 @@ function mostrarCarrito (){
             article.classList.add("productoEnCarrito");
             // Agrego el articulo a la seccion de productos en carrito
             productosEnCarrito.appendChild(article);
+            // Por cada producto del carrito sumo el total de la compra
+            totalCompra = parseFloat((totalCompra + producto.subtotal).toFixed(2));
         });
-        retomarCarrito();
-        calcularTotal();}
+        // Muestro el total de la compra
+        let total = document.createElement("article");
+        total.innerHTML = `<p>TOTAL</p>
+        <p id=total>USD ${totalCompra}.-</p>`
+        total.classList.add("totalCarrito");
+        productosEnCarrito.appendChild(total);
+        // Creo un contenedor en HTML para luego alojar los botones de "Vaciar" y "Continuar compra"
+        let espacioBotones = document.createElement("article");
+        espacioBotones.classList.add("espacioBotones")
+        // Agrego botones de vaciar carrito
+        let botonVaciar = document.createElement("button");
+        botonVaciar.innerHTML = `VACIAR`;
+        botonVaciar.classList.add("botones", "operacionVaciar");
+        espacioBotones.appendChild(botonVaciar);
+        // Agrego boton para continuar con la compra
+        let botonContinuar = document.createElement("button");
+        botonContinuar.innerHTML = `CONTINUAR COMPRA`;
+        botonContinuar.classList.add("botones", "operacionContinuar");
+        espacioBotones.appendChild(botonContinuar);
+        // Agrego toda la seccion
+        productosEnCarrito.appendChild(espacioBotones);
+        }
     else {
         // Si el carrito esta vacio, lo informo.
         carritoVacio();
     }
-}
-
-// Funcion secundaria que opera una vez mostrado el listado del carrito.
-function retomarCarrito (){
-    // Tomo los elementos "+" y "-" del HTML creado al estar en modo vista carrito.
-    let botonesCarritoAgregar = document.querySelectorAll('.agregarUnProducto');
-    let botonesCarritoRestar = document.querySelectorAll('.sacarUnProducto'); 
-    // Le doy funcionalidad a los nuevos botones "+" y "-" dentro de la vista de carrito.
-    // Agregar
-    botonesCarritoAgregar.forEach((boton) => {
-    // Detecto evento click en cada botón.
-    boton.addEventListener('click', (e) => {
-        // Comparo el id del producto con el id del boton clickeado
-        let idProducto = parseInt(e.target.dataset.id);
-        // Dentro de productoSeleccionado guardare la informacion del producto clickeado
-        let productoSeleccionado = carritoUsuario.find((producto) => producto.id === idProducto);
-            // Aumento la cantidad de productos en el carrito
-            productoSeleccionado.agregarProducto();
-            // Actualizo el HTML
-            let cantidadElemento = document.querySelector(`.cantidad-id-${idProducto}`);
-            cantidadElemento.textContent = productoSeleccionado.cantidad;
-            let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
-            subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
-            //Recalculo total
-            recalcularTotal();
-            })});
-    // Quitar
-    botonesCarritoRestar.forEach((boton) => {
-    // Detecto evento click en cada boton
-    boton.addEventListener('click', (e) => {
-        // Dentro de productoSeleccionado guardare la informacion del producto clickeado
-        // Comparo el id del producto con el id del boton clickeado
-        let idProducto = parseInt(e.target.dataset.id);        
-        let productoSeleccionado = carritoUsuario.find((producto) => producto.id === idProducto);
-            // Resto la cantidad de productos en el carrito
-            productoSeleccionado.restarProducto();
-            // Si al restar cantidad aun quedan productos, actualizo el HTML
-            if(productoSeleccionado.cantidad>0) {
-            let cantidadElemento = document.querySelector(`.cantidad-id-${idProducto}`);
-            cantidadElemento.textContent = productoSeleccionado.cantidad;
-            let subtotalElemento = cantidadElemento.parentElement.nextElementSibling;
-            subtotalElemento.textContent = `USD ${productoSeleccionado.subtotal}.-`;
-            }
-            //Recalculo total
-            recalcularTotal();
-        })
-    })
 };
 
-// Funcion para calcular el total de la compra, mostrarla en el HTML y modificar el DOM.
-function calcularTotal (){
-    totalCompra = 0;
-    let productosEnCarrito = document.querySelector('.listaCarrito');
-    let total = document.createElement("article");
-    // Por cada producto del carrito sumo el total
-    carritoUsuario.forEach((producto) =>{
-        totalCompra = parseFloat((totalCompra + producto.subtotal).toFixed(2));
-        
-    });
-    // Lo reflejo en HTML
-    total.innerHTML = `<p>TOTAL</p>
-    <p id=total>USD ${totalCompra}.-</p>`
-    total.classList.add("totalCarrito");
-    productosEnCarrito.appendChild(total);
-
-    // Creo un contenedor en HTML para luego alojar los botones de "Vaciar carrito" y "Finalizar compra"
-    let espacioBotones = document.createElement("article");
-    espacioBotones.classList.add("espacioBotones")
-    productosEnCarrito.appendChild(espacioBotones);
-
-    // Agrego botones de vaciar carrito
-    let botonVaciar = document.createElement("button");
-    botonVaciar.innerHTML = `VACIAR`;
-    botonVaciar.classList.add("botones");
-    botonVaciar.classList.add("operacionVaciar");
-    botonVaciar.addEventListener('click', () => {
-        // Librería de SweetAlert2
-        // Confirmo al usuario si quiere vaciar su carrito
-        Swal.fire({
-        title: "¿Deseas vaciar el carrito?",
-        text: "Eliminaras todos tus productos.",
-        icon: "question",
-        customClass: {
-            popup: 'vaciarPopup',
-            title: 'vaciarTitulo',
-            confirmButton: 'vaciarConfirm',
-            cancelButton: 'vaciarConfirm',
-        },
-        showCancelButton: true,
-        confirmButtonColor: "rgb(107, 194, 21)",
-        cancelButtonColor: "rgba(122, 122, 122, 1)",
-        confirmButtonText: "Si",
-        cancelButtonText: "No",
-        }).then((result) => {
-            if (result.isConfirmed) { // Si confirma, se vacia el carrito
-                Swal.fire({
-                title: "Carrito vacío.",
-                text: "Ya no tenes productos en tu carrito.",
-                icon: "warning",
-                customClass:{
-                    popup: 'vaciarPopup',
-                    title: 'vaciarTitulo',
-                    confirmButton:'vaciarConfirm',
-                },
-                confirmButtonColor: "rgb(107, 194, 21)",
-                });
-                vaciarCarrito()
-            }
-        });
-    ;})
-    espacioBotones.appendChild(botonVaciar);
-
-    // Agrego boton de "siguiente" para continuar con la compra
-    let botonContinuar = document.createElement("button");
-    botonContinuar.innerHTML = `CONTINUAR COMPRA`;
-    botonContinuar.classList.add("botones");
-    botonContinuar.classList.add("operacionContinuar");
-    botonContinuar.addEventListener('click', () => {
-        botonContinuar.classList.add('oculto');
-        botonVaciar.classList.add('oculto');
-        completarFormularioCompra();})
-        espacioBotones.appendChild(botonContinuar);
-};
-
-
+// Renderizar formulario de la compra y funcionalidad
 function completarFormularioCompra(){
-        // Almaceno el elemento de la clase listaCarrito.
+        // Almaceno el elemento de la clase listaCarrito pero oculto los botones para modificar las cantidades
         let ocultarMiniBotones = document.querySelectorAll('.miniBoton');
         ocultarMiniBotones.forEach((boton)=>{
                 boton.classList.add('oculto');
         })
+        // agrego el codigo para el formulario de compra
         let listadoDefinitivo = document.querySelector('.listaCarrito');
         let formularioCompra = document.createElement("article");
         formularioCompra.innerHTML = `
@@ -423,89 +388,8 @@ function completarFormularioCompra(){
             <button type="cancelButton" class="botonAtras">ATRAS</button>
             <button type="submit" class="operacionFinalizar">COMPRAR</button>
         </article>`
+        // Lo agrego al HTML
         listadoDefinitivo.appendChild(formularioCompra);
-        let botonAtras = document.querySelector('.botonAtras')
-        botonAtras.addEventListener('click', () => {
-            mostrarCarrito();
-            });
-        let botonComprar = document.querySelector('.operacionFinalizar');
-        botonComprar.addEventListener('click', (event) => {
-            // Envio Formulario con carrito listo para finalizar para historial de compras
-            event.preventDefault();
-            const formulario = document.querySelector('#miForm');
-            const datos = new FormData(formulario);
-            const datosCompletos = Object.fromEntries(datos.entries());
-            const datosFinales = {
-                cliente: datosCompletos,
-                carrito: carritoUsuario,
-                }
-            // Librería de SweetAlert2
-            // Confirmo al usuario si quiere concretar la compra
-            Swal.fire({
-            title: "¿Finalizar compra?",
-            icon: "question",
-            customClass: {
-                popup: 'vaciarPopup',
-                title: 'vaciarTitulo',
-                confirmButton: 'vaciarConfirm',
-                cancelButton: 'vaciarConfirm',
-            },
-            showCancelButton: true,
-            confirmButtonColor: "rgb(107, 194, 21)",
-            cancelButtonColor: "rgba(122, 122, 122, 1)",
-            confirmButtonText: "Si",
-            cancelButtonText: "No",
-            }).then((result) => {
-                if (result.isConfirmed) { // Si confirma:
-                    // Guardo el formulario con la informacion de la compra y el formulario
-                    let historialCompras = JSON.parse(localStorage.getItem("historialCompras")) || [];
-                    historialCompras.push(datosFinales);
-                    localStorage.setItem("historialCompras", JSON.stringify(historialCompras));
-                    // Muestro mensaje de finalizado
-                    finalizarCarrito(); 
-                }
-            });
-        ;})
-}
-
-// Funcion para guardar los datos del formulario de compra en un archivo JSON local
-
-// Funcion que elimina todos los productos del carrito
-function vaciarCarrito(){
-    // Reinicia variables globales.
-    carritoUsuario = [];
-    totalCompra = 0;
-    localStorage.removeItem("CarritoTG");
-    // Al vaciar el carrito genero notificacion
-        Toastify({
-        text: "El carrito esta vacío",
-        duration: 3000,
-        newWindow: true,
-        close: true,
-        gravity: "top",
-        position: "right",
-        style: {
-            background: "linear-gradient(to right, #999999ff, #414141ff)",
-            borderRadius: "30px",
-        },
-        onClick: function(){} 
-        }).showToast();
-    carritoVacio();
-}
-
-// Actualiza el total del carrito en el HTML.
-function recalcularTotal() {
-    let totalElemento=document.querySelector(`#total`);
-    totalCompra = 0;
-    if (carritoUsuario.length !== 0){
-    carritoUsuario.forEach((producto) =>{
-        totalCompra = parseFloat((totalCompra + producto.subtotal).toFixed(2));
-    });
-    totalElemento.textContent = `USD ${totalCompra}.-`;}
-    else {
-        carritoVacio();
-    }
-    localStorage.setItem("CarritoTG", JSON.stringify(carritoUsuario));
 }
 
 // Funcion que muestra un mensaje si el carrito esta vacio
@@ -536,41 +420,12 @@ function finalizarCarrito() {
     localStorage.removeItem("CarritoTG");
 }
 
-// Funciones de ordenamiento  y filtro de productos
-
-function ordernarProductosPor(objetos,orden) {
-    listaOrdenada = objetos.slice();
-    listaOrdenada.sort((a,b)=> { 
-        if (a.nombre > b.nombre){return (1 * orden)}
-        if (a.nombre < b.nombre){return (-1 * orden)}
-        return 0;
-    })
-};
-
-function filtrarProductos(objetos,consola) {
-    listaOrdenada = objetos.slice();
-    listaOrdenada = listaOrdenada.filter(prod => prod.consola === consola)
-    mostrarProductosHTML(listaOrdenada);
-};
-
 // *************************** EVENTOS ********************************* //
 
+// Ejecuto la funcion para completar el listado de productos.
+buscarListaProductosJSON();
+
 // Alternar entre vista carrito/productos.
-
-// Variable que almacena el texto del boton, ya sea "Ver Carrito" o "Volver a Productos".
-let carritoYProductos = document.querySelector('.verCarrito');
-// Variable que almacena listado de productos en HTML.
-let articulosProductos = document.querySelector('.listaProductos');
-// Variable que almacena listado del carrito en HTML.
-let productosEnCarrito = document.querySelector('.listaCarrito');
-// Variable para texto contextual de la sección.
-let infoSeccion = document.querySelector('h3');
-// Variable para el carousel
-let carouselVisible = document.querySelector('#carousel-news');
-// Variable para los filtros de busqueda
-let filtrosDeBusqueda = document.querySelector('.filtrosDeBusqueda');
-
-
 carritoYProductos.addEventListener('click', () => {
     // Agrego clase con estilo del boton
     if (carritoYProductos.innerText == "Ver carrito"){
@@ -580,7 +435,6 @@ carritoYProductos.addEventListener('click', () => {
         carritoYProductos.classList.remove('verCarrito');
         // Oculto productos y muestro carrito;
         articulosProductos.classList.add('oculto');
-        // articulosProductos.classList.add('oculto');
         carouselVisible.classList.add('oculto');
         productosEnCarrito.classList.remove('oculto');
         filtrosDeBusqueda.classList.add('oculto');
@@ -603,6 +457,104 @@ carritoYProductos.addEventListener('click', () => {
     }
 });
 
+// Evento para modificar cantidades desde vista carrito
+// Tomo los elementos "+" y "-" del HTML creado al estar en modo vista carrito.
+productosEnCarrito.addEventListener("click",(e) =>{
+    // Comparo el id del producto con el id del boton clickeado
+    let idSeleccionado = Number(e.target.dataset.id);
+    // Dentro de productoSeleccionado guardare la informacion del producto clickeado
+    let productoSeleccionado = carritoUsuario.find(p => p.id === idSeleccionado);
+    if (e.target.classList.contains("agregarUnProducto")) {
+        productoSeleccionado.guardarCarrito('agregar');
+        mostrarCarrito();
+    }
+    if (e.target.classList.contains("sacarUnProducto")) {
+        productoSeleccionado.guardarCarrito('restar');
+        mostrarCarrito();
+    }
+    if(e.target.classList.contains("operacionVaciar")){
+        // Confirmo al usuario si quiere vaciar su carrito
+        Swal.fire({ // Librería de SweetAlert2
+        title: "¿Deseas vaciar el carrito?",
+        text: "Eliminaras todos tus productos.",
+        icon: "question",
+        customClass: {
+            popup: 'vaciarPopup',
+            title: 'vaciarTitulo',
+            confirmButton: 'vaciarConfirm',
+            cancelButton: 'vaciarConfirm',
+        },
+        showCancelButton: true,
+        confirmButtonColor: "rgb(107, 194, 21)",
+        cancelButtonColor: "rgba(122, 122, 122, 1)",
+        confirmButtonText: "Si",
+        cancelButtonText: "No",
+        }).then((result) => {
+            if (result.isConfirmed) { // Si confirma, se vacia el carrito
+                Swal.fire({
+                title: "Carrito vacío.",
+                text: "Ya no tenes productos en tu carrito.",
+                icon: "warning",
+                customClass:{
+                    popup: 'vaciarPopup',
+                    title: 'vaciarTitulo',
+                    confirmButton:'vaciarConfirm',
+                },
+                confirmButtonColor: "rgb(107, 194, 21)",
+                });
+                vaciarCarrito();
+            };
+        });
+    }
+    if (e.target.classList.contains("operacionContinuar")){
+        // Oculto los botones
+        e.target.classList.add('oculto');
+        document.querySelector('.operacionVaciar').classList.add('oculto');
+        // Muestro formulario de compra
+        completarFormularioCompra();
+    }
+    if (e.target.classList.contains("operacionFinalizar")){
+        // Envio Formulario con carrito listo para finalizar para historial de compras
+        e.preventDefault();
+        const formulario = document.querySelector('#miForm');
+        const datos = new FormData(formulario);
+        const datosCompletos = Object.fromEntries(datos.entries());
+        const datosFinales = {
+            cliente: datosCompletos,
+            carrito: carritoUsuario,
+            }
+        // Librería de SweetAlert2
+        // Confirmo al usuario si quiere concretar la compra
+        Swal.fire({
+        title: "¿Finalizar compra?",
+        icon: "question",
+        customClass: {
+            popup: 'vaciarPopup',
+            title: 'vaciarTitulo',
+            confirmButton: 'vaciarConfirm',
+            cancelButton: 'vaciarConfirm',
+        },
+        showCancelButton: true,
+        confirmButtonColor: "rgb(107, 194, 21)",
+        cancelButtonColor: "rgba(122, 122, 122, 1)",
+        confirmButtonText: "Si",
+        cancelButtonText: "No",
+        }).then((result) => {
+            if (result.isConfirmed) { // Si confirma:
+                // Guardo el formulario con la informacion de la compra y el formulario
+                let historialCompras = JSON.parse(localStorage.getItem("historialCompras")) || [];
+                historialCompras.push(datosFinales);
+                localStorage.setItem("historialCompras", JSON.stringify(historialCompras));
+                // Muestro mensaje de finalizado
+                finalizarCarrito(); 
+            }
+        });
+    ;}
+    if (e.target.classList.contains("botonAtras")){
+        mostrarCarrito();
+    }
+});
+
 // Eventos para modos de ordenar
 
 // Orden ascendente y descendente
@@ -621,6 +573,7 @@ seleccionarOrden.addEventListener('change', (e) => {
     mostrarProductosHTML(listaOrdenada);
 });
 
+// Filtrar por consola
 const seleccionarConsola = document.getElementById("SeleccionConsola");
 seleccionarConsola.addEventListener('change', (e) => {
     const valorSeleccionado = e.target.value;
